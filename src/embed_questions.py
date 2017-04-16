@@ -22,7 +22,7 @@ def clean_string(q):
     return cleaned
 
 
-data_path = '/home/ubuntu/quora/src'
+data_path = '/home/ubuntu/quora_data'
 df = pd.read_csv('{}/train.csv'.format(data_path))
 df.dropna(inplace=True)
 
@@ -50,4 +50,4 @@ if __name__ == '__main__':
     df['mat1'] = [q_to_mat(q, vec_model) for q in df['question1']]
     df['mat2'] = [q_to_mat(q, vec_model) for q in df['question2']]
     feature_mat = featurize(df)
-    pickle.dump(feature_mat, open('/home/ubuntu/quora/nn_mat.pkl', 'wb'))
+    pickle.dump(feature_mat, open('/home/ubuntu/quora_data/nn_mat.pkl', 'wb'))
