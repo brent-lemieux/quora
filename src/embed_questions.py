@@ -49,5 +49,5 @@ def featurize(df):
 if __name__ == '__main__':
     df['mat1'] = [q_to_mat(q, vec_model) for q in df['question1']]
     df['mat2'] = [q_to_mat(q, vec_model) for q in df['question2']]
-    feature_mat = featurize(df)
+    feature_mat = featurize(df.iloc[:5000])
     pickle.dump(feature_mat, open('/home/ubuntu/quora_data/nn_mat.pkl', 'wb'))
