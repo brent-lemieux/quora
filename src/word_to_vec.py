@@ -20,7 +20,7 @@ def clean_string(q):
     return cleaned
 
 # change for AWS Instance
-data_path = '/home/ubuntu/quora_data'
+data_path = '~/projects/quora_data'
 df = pd.read_csv('{}/train.csv'.format(data_path))
 df.dropna(inplace=True)
 
@@ -30,5 +30,5 @@ sentences = sentences.map(lambda x: x.lower().split())
 
 size = sentences.map(len)
 
-vec_model = Word2Vec(sentences, size=60, workers=3)
-vec_model.save('/home/ubuntu/quora/models/wordvec')
+vec_model = Word2Vec(sentences, size=30, workers=3)
+vec_model.save('~/projects/quora/models/wordvec2')
