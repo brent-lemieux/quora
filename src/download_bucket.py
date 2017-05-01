@@ -16,16 +16,22 @@ except:
         access_key = keys["AWS_ACCESS_KEY_ID"]
         secret_key = keys["AWS_SECRET_ACCESS_KEY"]
 
-bucket_name = "quora-bwl"
-conn = boto.connect_s3(access_key, secret_key, host='s3.amazonaws.com')
-bucket = conn.get_bucket(bucket_name)
+
+def get_file(f):
+    bucket_name = "quora-bwl"
+    conn = boto.connect_s3(access_key, secret_key, host='s3.amazonaws.com')
+    bucket = conn.get_bucket(bucket_name)
+
+    key = bucket.get_key(f)
+    key.ongoing_restore
+    file_name = str(key.name).split('/')[-1]
+    try:
+        key.get_contents_to_filename(file_name)
+        print ('Passed --- ', file_name)
+    except:
+        print ('Failed --- ', file_name)
 
 
-key = bucket.get_key('train.csv')
-print (key.ongoing_restore)
-file_name = str(key.name).split('/')[-1]
-try:
-    key.get_contents_to_filename(file_name)
-    print ('Passed --- ', file_name)
-except:
-    print ('Failed --- ', file_name)
+if __name__ == '__main__':
+    get_file('embeddings_small.csv')
+    get_file('labels.csv')
