@@ -4,8 +4,6 @@
 * Bag of words vectorizer
 * Pad sequences
 * Keras models with embeddings --> MLP/CNN
-
-Running on: ec2-52-44-238-136.compute-1.amazonaws.com
 '''
 
 import numpy as np
@@ -18,19 +16,19 @@ from sklearn.feature_extraction.stop_words import ENGLISH_STOP_WORDS as stop_wor
 
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
-from keras.layers.convolutional import Conv1D
-from keras.layers.convolutional import MaxPooling1D
+from keras.layers.convolutional import Conv2D
+from keras.layers.convolutional import MaxPooling2D
 from keras.layers import Flatten
 from keras.layers.embeddings import Embedding
 from keras.preprocessing import sequence
 from keras.preprocessing.text import Tokenizer
+from keras.layers.core import Reshape
 
 vocab_size = 50000
 embed_size = 256
 question_len = 60
 
 def remove_stop(text):
-    '''Remove stop words from questions'''
     stop_free = []
     for word in text.split():
         if word not in stop_words:
@@ -38,7 +36,7 @@ def remove_stop(text):
     return ' '.join(stop_free)
 
 def preprocess(f_path):
-    '''Load cleaned data'''
+    # Load cleaned data
     df = pd.read_csv(f_path)
     df.fillna('blank', inplace=True)
     q1 = df['question1'].map(remove_stop).values
@@ -59,29 +57,28 @@ def preprocess(f_path):
 
 # Build model
 
+
 def build_cnn():
-    '''Build CNN to be called below for training'''
     model = Sequential()
     model.add(Embedding(vocab_size, embed_size, input_length=question_len * 2))
-    model.add(Conv1D(filters=32, kernel_size=30, padding='same', activation='tanh'))
-    model.add(MaxPooling1D(pool_size=10))
-    model.add(Conv1D(filters=32, kernel_size=20, padding='same', activation='tanh'))
-    model.add(MaxPooling1D(pool_size=10))
+    # model.add(Flatten())
+    model.add(Reshape((1,embed_size*question_len,2)))
+    model.add(Conv2D(filters=32, kernel_size=(2,embed_size), padding='same', activation='tanh'))
+    model.add(MaxPooling2D(pool_size=(2,2)))
     model.add(Flatten())
     model.add(Dense(500, activation='relu'))
-    model.add(Dense(200, activation='relu'))
     model.add(Dense(1, activation='sigmoid'))
-    model.compile(loss='binary_crossentropy', optimizer='nadam', metrics=['accuracy'])
+    model.compile(loss='binary_crossentropy', optimizer='adam', metrics=['accuracy'])
     return model
 
 # Train model
 
 def train_model(model_builder, X_train, X_test, y_train, y_test, num_epochs=2):
-    '''Train the model with X_train and y_train'''
     model = model_builder()
     model.fit(X_train, y_train, validation_data=(X_test, y_test), epochs=num_epochs,
         batch_size=500, verbose=1)
     return model
+
 
 
 if __name__ == '__main__':
